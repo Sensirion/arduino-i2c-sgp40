@@ -40,9 +40,8 @@
 
 SensirionI2CSgp40 sgp40;
 
-// TODO: DRIVER_GENERATOR Add missing commands and make printout more pretty
-
 void setup() {
+    uint16_t testResult;
 
     Serial.begin(115200);
     while (!Serial) {
@@ -56,15 +55,33 @@ void setup() {
 
     sgp40.begin(Wire);
 
-    // Start Measurement
+    error = sgp40.measureTest(testResult);
+    if (error) {
+        Serial.print("Error trying to execute measureTest(): ");
+        errorToString(error, errorMessage, 256);
+        Serial.println(errorMessage);
+    } else if (testResult != 0xD400) {
+        Serial.print("measureTest failed with errror: ");
+        Serial.println(testResult);
+    }
 }
 
 void loop() {
     uint16_t error;
     char errorMessage[256];
+    uint16_t defaultRh = 0x8000;
+    uint16_t defaultT = 0x6666;
+    uint16_t srawVoc = 0;
 
-    // TODO: DRIVER_GENERATOR Adjust measurement delay
     delay(1000);
-    // TODO: DRIVER_GENERATOR Add scale and offset to printed measurement values
-    // Read Measurement
+
+    error = sgp40.measureRaw(defaultRh, defaultT, srawVoc);
+    if (error) {
+        Serial.print("Error trying to execute measureRaw(): ");
+        errorToString(error, errorMessage, 256);
+        Serial.println(errorMessage);
+    } else {
+        Serial.print("SRAW_VOC:");
+        Serial.println(srawVoc);
+    }
 }

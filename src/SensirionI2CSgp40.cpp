@@ -55,11 +55,12 @@ uint16_t SensirionI2CSgp40::measureRaw(uint16_t relativeHumidity,
                                        uint16_t& srawVoc) {
     uint16_t error;
     uint8_t buffer[8];
-    SensirionI2CTxFrame txFrame(buffer, 8);
+    SensirionI2CTxFrame txFrame =
+        SensirionI2CTxFrame::createWithUInt16Command(0x260F, buffer, 8);
 
-    error = txFrame.addCommand(0x260F);
-    error |= txFrame.addUInt16(relativeHumidity);
+    error = txFrame.addUInt16(relativeHumidity);
     error |= txFrame.addUInt16(temperature);
+
     if (error) {
         return error;
     }
@@ -86,12 +87,8 @@ uint16_t SensirionI2CSgp40::measureRaw(uint16_t relativeHumidity,
 uint16_t SensirionI2CSgp40::measureTest(uint16_t& testResult) {
     uint16_t error;
     uint8_t buffer[3];
-    SensirionI2CTxFrame txFrame(buffer, 3);
-
-    error = txFrame.addCommand(0x280E);
-    if (error) {
-        return error;
-    }
+    SensirionI2CTxFrame txFrame =
+        SensirionI2CTxFrame::createWithUInt16Command(0x280E, buffer, 3);
 
     error = SensirionI2CCommunication::sendFrame(SGP40_I2C_ADDRESS, txFrame,
                                                  *_i2cBus);
@@ -115,12 +112,8 @@ uint16_t SensirionI2CSgp40::measureTest(uint16_t& testResult) {
 uint16_t SensirionI2CSgp40::turnHeaterOff() {
     uint16_t error;
     uint8_t buffer[2];
-    SensirionI2CTxFrame txFrame(buffer, 2);
-
-    error = txFrame.addCommand(0x3615);
-    if (error) {
-        return error;
-    }
+    SensirionI2CTxFrame txFrame =
+        SensirionI2CTxFrame::createWithUInt16Command(0x3615, buffer, 2);
 
     error = SensirionI2CCommunication::sendFrame(SGP40_I2C_ADDRESS, txFrame,
                                                  *_i2cBus);
