@@ -11,9 +11,10 @@ SensirionI2CSgp40	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-measureRaw	KEYWORD2
-measureTest	KEYWORD2
+measureRawSignal	KEYWORD2
+executeSelfTest	KEYWORD2
 turnHeaterOff	KEYWORD2
+getSerialNumber	KEYWORD2
 #######################################
 # Instances (KEYWORD2)
 #######################################

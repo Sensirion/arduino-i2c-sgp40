@@ -1,7 +1,7 @@
 /*
- * I2C-Generator: 0.2.0
+ * I2C-Generator: 0.3.0
  * Yaml Version: 0.1.0
- * Template Version: local build
+ * Template Version: 0.7.0-62-g3d691f9
  */
 /*
  * Copyright (c) 2021, Sensirion AG
@@ -41,7 +41,6 @@
 SensirionI2CSgp40 sgp40;
 
 void setup() {
-    uint16_t testResult;
 
     Serial.begin(115200);
     while (!Serial) {
@@ -55,13 +54,36 @@ void setup() {
 
     sgp40.begin(Wire);
 
-    error = sgp40.measureTest(testResult);
+    uint16_t serialNumber[3];
+    uint8_t serialNumberSize = 3;
+
+    error = sgp40.getSerialNumber(serialNumber, serialNumberSize);
+
     if (error) {
-        Serial.print("Error trying to execute measureTest(): ");
+        Serial.print("Error trying to execute getSerialNumber(): ");
+        errorToString(error, errorMessage, 256);
+        Serial.println(errorMessage);
+    } else {
+        Serial.print("SerialNumber:");
+        Serial.print("0x");
+        for (size_t i = 0; i < serialNumberSize; i++) {
+            uint16_t value = serialNumber[i];
+            Serial.print(value < 4096 ? "0" : "");
+            Serial.print(value < 256 ? "0" : "");
+            Serial.print(value < 16 ? "0" : "");
+            Serial.print(value, HEX);
+        }
+        Serial.println();
+    }
+
+    uint16_t testResult;
+    error = sgp40.executeSelfTest(testResult);
+    if (error) {
+        Serial.print("Error trying to execute executeSelfTest(): ");
         errorToString(error, errorMessage, 256);
         Serial.println(errorMessage);
     } else if (testResult != 0xD400) {
-        Serial.print("measureTest failed with errror: ");
+        Serial.print("executeSelfTest failed with error: ");
         Serial.println(testResult);
     }
 }
@@ -75,9 +97,9 @@ void loop() {
 
     delay(1000);
 
-    error = sgp40.measureRaw(defaultRh, defaultT, srawVoc);
+    error = sgp40.measureRawSignal(defaultRh, defaultT, srawVoc);
     if (error) {
-        Serial.print("Error trying to execute measureRaw(): ");
+        Serial.print("Error trying to execute measureRawSignal(): ");
         errorToString(error, errorMessage, 256);
         Serial.println(errorMessage);
     } else {
